@@ -1,0 +1,255 @@
+CREATE TABLE MARCA (
+  idMarca INT AUTO_INCREMENT PRIMARY KEY,
+  nombreMarca VARCHAR(100) NOT NULL,
+  paisOrigen VARCHAR(300) NOT NULL,
+  estado VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE TIENDA (
+  idTienda INT AUTO_INCREMENT PRIMARY KEY,
+  nit INT,
+  nombre VARCHAR(100),
+  direccion VARCHAR(100),
+  telefono VARCHAR(20),
+  estado VARCHAR(20)
+);
+
+CREATE TABLE PROVEEDOR (
+  idProveedor INT AUTO_INCREMENT PRIMARY KEY,
+  nit VARCHAR(20) NOT NULL,
+  razonSocial VARCHAR(100) NOT NULL,
+  contacto VARCHAR(100),
+  estado VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE CATEGORIA (
+  idCategoria INT AUTO_INCREMENT PRIMARY KEY,
+  nombreCat VARCHAR(20) NOT NULL,
+  descripcion VARCHAR(100),
+  estado VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE EMPLEADO (
+  idEmpleado INT AUTO_INCREMENT PRIMARY KEY,
+  sucursal_id INT,
+  cargo_id INT,
+  num_documento VARCHAR(20) NOT NULL,
+  tipo_documento VARCHAR(20) NOT NULL,
+  nombres VARCHAR(100) NOT NULL,
+  apellidos VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  telefono VARCHAR(20),
+  fecha_ingreso DATE NOT NULL,
+  estado VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE CLIENTE (
+  idCliente INT AUTO_INCREMENT PRIMARY KEY,
+  codigoVendedor VARCHAR(20),
+  nombre VARCHAR(100),
+  cargo VARCHAR(100),
+  documento VARCHAR(100),
+  telefono VARCHAR(20),
+  estado VARCHAR(20)
+);
+
+CREATE TABLE PC (
+  idPC BIGINT AUTO_INCREMENT PRIMARY KEY,
+  marca VARCHAR(100),
+  modelo VARCHAR(100),
+  precio DOUBLE,
+  tipo VARCHAR(200),
+  estado VARCHAR(20),
+  TIENDAidTienda INT,
+  MARCAidMarca INT,
+  PROVEEDORidProveedor INT,
+  CATEGORIAidCategoria INT,
+  CONSTRAINT fk_pc_tienda FOREIGN KEY (TIENDAidTienda) REFERENCES TIENDA(idTienda),
+  CONSTRAINT fk_pc_marca FOREIGN KEY (MARCAidMarca) REFERENCES MARCA(idMarca),
+  CONSTRAINT fk_pc_proveedor FOREIGN KEY (PROVEEDORidProveedor) REFERENCES PROVEEDOR(idProveedor),
+  CONSTRAINT fk_pc_categoria FOREIGN KEY (CATEGORIAidCategoria) REFERENCES CATEGORIA(idCategoria)
+);
+
+CREATE TABLE PERIFERICO (
+  IDPeriferico INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  precio DOUBLE NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  esGamer INT,
+  PCidPC BIGINT,
+  MARCAidMarca INT,
+  CONSTRAINT fk_peri_pc FOREIGN KEY (PCidPC) REFERENCES PC(idPC),
+  CONSTRAINT fk_peri_marca FOREIGN KEY (MARCAidMarca) REFERENCES MARCA(idMarca)
+);
+
+CREATE TABLE GARANTIA (
+  idGarantia INT AUTO_INCREMENT PRIMARY KEY,
+  idPC INT,
+  producto_id INT,
+  cliente_id INT,
+  fecha_inicio DATE NOT NULL,
+  numero_serie VARCHAR(100) NOT NULL,
+  fecha_fin DATE,
+  estado VARCHAR(20) NOT NULL,
+  PCidPC BIGINT,
+  CONSTRAINT fk_gar_pc FOREIGN KEY (PCidPC) REFERENCES PC(idPC)
+);
+
+CREATE TABLE VENTA (
+  idVenta INT AUTO_INCREMENT PRIMARY KEY,
+  fecha DATE NOT NULL,
+  total DOUBLE NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  EMPLEADOidEmpleado INT,
+  CLIENTEidCliente INT,
+  CONSTRAINT fk_venta_empleado FOREIGN KEY (EMPLEADOidEmpleado) REFERENCES EMPLEADO(idEmpleado),
+  CONSTRAINT fk_venta_cliente FOREIGN KEY (CLIENTEidCliente) REFERENCES CLIENTE(idCliente)
+);
+
+CREATE TABLE DETALLE_VENTA (
+  idDetalle INT AUTO_INCREMENT PRIMARY KEY,
+  cantidad INT NOT NULL,
+  subtotal DECIMAL(12,2) NOT NULL,
+  descuento DECIMAL(12,2) DEFAULT 0,
+  IVA DECIMAL(12,2) NOT NULL,
+  total DECIMAL(12,2) NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  PCidPC BIGINT,
+  VENTAidVenta INT,
+  IDPeriferico INT,
+  CONSTRAINT fk_det_pc FOREIGN KEY (PCidPC) REFERENCES PC(idPC),
+  CONSTRAINT fk_det_venta FOREIGN KEY (VENTAidVenta) REFERENCES VENTA(idVenta),
+  CONSTRAINT fk_det_peri FOREIGN KEY (IDPeriferico) REFERENCES PERIFERICO(IDPeriferico)
+);
+
+INSERT INTO MARCA (nombreMarca, paisOrigen, estado) VALUES
+('Dell', 'Estados Unidos', 'activo'),
+('HP', 'Estados Unidos', 'activo'),
+('Lenovo', 'China', 'activo'),
+('Asus', 'Taiwan', 'activo'),
+('Acer', 'Taiwan', 'activo'),
+('MSI', 'Taiwan', 'activo'),
+('Apple', 'Estados Unidos', 'activo'),
+('Samsung', 'Corea del Sur', 'activo'),
+('Toshiba', 'Japon', 'inactivo'),
+('Gigabyte', 'Taiwan', 'activo');
+
+INSERT INTO TIENDA (nit, nombre, direccion, telefono, estado) VALUES
+(900123456, 'TecnoStore Ibague', 'Calle 42 # 5-23', '3001234567', 'activo'),
+(900234567, 'PC World', 'Carrera 5 # 12-10', '3012345678', 'activo'),
+(900345678, 'Digital Center', 'Av. Ambala # 3-45', '3023456789', 'activo'),
+(900456789, 'CompuMax', 'Calle 60 # 8-90', '3034567890', 'activo'),
+(900567890, 'TechZone', 'Carrera 15 # 20-11', '3045678901', 'activo'),
+(900678901, 'InfoTech', 'Calle 19 # 4-67', '3056789012', 'activo'),
+(900789012, 'MegaPC', 'Carrera 3 # 9-88', '3067890123', 'activo'),
+(900890123, 'SystemShop', 'Av. 60 # 7-34', '3078901234', 'activo'),
+(900901234, 'CompuVision', 'Calle 10 # 2-56', '3089012345', 'activo'),
+(901012345, 'TecnoPlus', 'Carrera 8 # 15-23', '3090123456', 'activo');
+
+INSERT INTO PROVEEDOR (nit, razonSocial, contacto, estado) VALUES
+('800111111', 'Distribuidora Dell Colombia', 'Carlos Perez', 'activo'),
+('800222222', 'HP Mayorista SAS', 'Ana Gomez', 'activo'),
+('800333333', 'Lenovo Distribuidor Oficial', 'Pedro Ramirez', 'activo'),
+('800444444', 'Asus Colombia Ltda', 'Maria Lopez', 'activo'),
+('800555555', 'Acer Soluciones SAS', 'Luis Torres', 'activo'),
+('800666666', 'MSI Tech Colombia', 'Sandra Vargas', 'activo'),
+('800777777', 'Apple Premium Reseller', 'Jorge Castillo', 'activo'),
+('800888888', 'Samsung Business Colombia', 'Diana Herrera', 'activo'),
+('800999999', 'TechImport SAS', 'Ricardo Mendez', 'activo'),
+('801000000', 'Global Tech Ltda', 'Claudia Rios', 'activo');
+
+INSERT INTO CATEGORIA (nombreCat, descripcion, estado) VALUES
+('Gaming', 'PCs para alto rendimiento en juegos', 'activo'),
+('Oficina', 'PCs para uso empresarial y oficina', 'activo'),
+('Diseno', 'PCs para diseno grafico y video', 'activo'),
+('Educacion', 'PCs para uso educativo', 'activo'),
+('Servidor', 'PCs tipo servidor', 'activo'),
+('Portatil', 'Computadores portatiles', 'activo'),
+('All in One', 'PCs todo en uno', 'activo'),
+('Workstation', 'Estaciones de trabajo', 'activo'),
+('Mini PC', 'Computadores de formato mini', 'activo'),
+('Basica', 'PCs de uso basico', 'activo');
+
+INSERT INTO EMPLEADO (sucursal_id, cargo_id, num_documento, tipo_documento, nombres, apellidos, email, telefono, fecha_ingreso, estado) VALUES
+(1, 1, '1001234567', 'CC', 'Juan Carlos', 'Ramirez Perez', 'jramirez@tecno.com', '3101234567', '2020-01-15', 'activo'),
+(1, 2, '1002345678', 'CC', 'Maria Paula', 'Gomez Lopez', 'mgomez@tecno.com', '3112345678', '2020-03-20', 'activo'),
+(2, 1, '1003456789', 'CC', 'Carlos Eduardo', 'Torres Vargas', 'ctorres@tecno.com', '3123456789', '2021-05-10', 'activo'),
+(2, 3, '1004567890', 'CC', 'Ana Maria', 'Herrera Castro', 'aherrera@tecno.com', '3134567890', '2021-07-01', 'activo'),
+(3, 2, '1005678901', 'CC', 'Luis Fernando', 'Mendez Rios', 'lmendez@tecno.com', '3145678901', '2022-02-14', 'activo'),
+(3, 1, '1006789012', 'CC', 'Sandra Milena', 'Castillo Mora', 'scastillo@tecno.com', '3156789012', '2022-04-18', 'activo'),
+(4, 3, '1007890123', 'CC', 'Ricardo', 'Vargas Suarez', 'rvargas@tecno.com', '3167890123', '2023-01-09', 'activo'),
+(4, 2, '1008901234', 'CC', 'Diana Carolina', 'Perez Jimenez', 'dperez@tecno.com', '3178901234', '2023-03-22', 'activo'),
+(5, 1, '1009012345', 'CC', 'Jorge Alberto', 'Lopez Reyes', 'jlopez@tecno.com', '3189012345', '2023-06-30', 'activo'),
+(5, 3, '1010123456', 'CC', 'Claudia Patricia', 'Reyes Ortiz', 'creyes@tecno.com', '3190123456', '2024-01-05', 'activo');
+
+INSERT INTO CLIENTE (codigoVendedor, nombre, cargo, documento, telefono, estado) VALUES
+('VEN001', 'Andres Morales', 'Gerente', '1011234567', '3201234567', 'activo'),
+('VEN002', 'Patricia Suarez', 'Contador', '1012345678', '3212345678', 'activo'),
+('VEN001', 'Roberto Jimenez', 'Ingeniero', '1013456789', '3223456789', 'activo'),
+('VEN003', 'Lucia Fernandez', 'Disenadora', '1014567890', '3234567890', 'activo'),
+('VEN002', 'Miguel Angel', 'Estudiante', '1015678901', '3245678901', 'activo'),
+('VEN001', 'Valentina Cruz', 'Docente', '1016789012', '3256789012', 'activo'),
+('VEN003', 'Camilo Ospina', 'Arquitecto', '1017890123', '3267890123', 'activo'),
+('VEN002', 'Natalia Rios', 'Abogada', '1018901234', '3278901234', 'activo'),
+('VEN001', 'Sebastian Mora', 'Medico', '1019012345', '3289012345', 'activo'),
+('VEN003', 'Isabella Castro', 'Empresaria', '1020123456', '3290123456', 'activo');
+
+INSERT INTO PC (marca, modelo, precio, tipo, estado, TIENDAidTienda, MARCAidMarca, PROVEEDORidProveedor, CATEGORIAidCategoria) VALUES
+('Dell', 'Inspiron 15 3520', 2800000, 'Portatil', 'activo', 1, 1, 1, 2),
+('HP', 'Pavilion Gaming 15', 4500000, 'Gaming', 'activo', 2, 2, 2, 1),
+('Lenovo', 'IdeaPad 3', 2200000, 'Portatil', 'activo', 3, 3, 3, 4),
+('Asus', 'ROG Strix G15', 6800000, 'Gaming', 'activo', 4, 4, 4, 1),
+('Acer', 'Aspire 5', 2500000, 'Portatil', 'activo', 5, 5, 5, 2),
+('MSI', 'Creator 15', 8900000, 'Workstation', 'activo', 6, 6, 6, 8),
+('Apple', 'MacBook Air M2', 7200000, 'Portatil', 'activo', 7, 7, 7, 3),
+('Samsung', 'Galaxy Book3', 5100000, 'Portatil', 'activo', 8, 8, 8, 2),
+('Dell', 'OptiPlex 7010', 3600000, 'Escritorio', 'activo', 9, 1, 1, 2),
+('HP', 'EliteDesk 800', 4200000, 'Escritorio', 'activo', 10, 2, 2, 5);
+
+INSERT INTO PERIFERICO (nombre, precio, estado, esGamer, PCidPC, MARCAidMarca) VALUES
+('Mouse Optico Dell', 45000, 'activo', 0, 1, 1),
+('Teclado Mecanico HP', 180000, 'activo', 1, 2, 2),
+('Monitor 24 Lenovo', 650000, 'activo', 0, 3, 3),
+('Headset Gaming Asus', 320000, 'activo', 1, 4, 4),
+('Webcam Acer HD', 95000, 'activo', 0, 5, 5),
+('Mouse Pad XL MSI', 75000, 'activo', 1, 6, 6),
+('Hub USB Apple', 120000, 'activo', 0, 7, 7),
+('Teclado Inalambrico Samsung', 145000, 'activo', 0, 8, 8),
+('Monitor 27 Dell', 980000, 'activo', 0, 9, 1),
+('Auriculares HP', 210000, 'activo', 1, 10, 2);
+
+INSERT INTO GARANTIA (idPC, producto_id, cliente_id, fecha_inicio, numero_serie, fecha_fin, estado, PCidPC) VALUES
+(1, 1, 1, '2024-01-10', 'SN-DELL-001', '2026-01-10', 'activo', 1),
+(2, 2, 2, '2024-02-15', 'SN-HP-002', '2026-02-15', 'activo', 2),
+(3, 3, 3, '2024-03-20', 'SN-LEN-003', '2025-03-20', 'activo', 3),
+(4, 4, 4, '2024-04-05', 'SN-ASUS-004', '2026-04-05', 'activo', 4),
+(5, 5, 5, '2024-05-12', 'SN-ACER-005', '2025-05-12', 'activo', 5),
+(6, 6, 6, '2024-06-18', 'SN-MSI-006', '2026-06-18', 'activo', 6),
+(7, 7, 7, '2024-07-22', 'SN-APPLE-007', '2026-07-22', 'activo', 7),
+(8, 8, 8, '2024-08-30', 'SN-SAM-008', '2026-08-30', 'activo', 8),
+(9, 9, 9, '2024-09-14', 'SN-DELL-009', '2025-09-14', 'activo', 9),
+(10, 10, 10, '2024-10-01', 'SN-HP-010', '2026-10-01', 'activo', 10);
+
+INSERT INTO VENTA (fecha, total, estado, EMPLEADOidEmpleado, CLIENTEidCliente) VALUES
+('2024-01-10', 2845000, 'pagado', 1, 1),
+('2024-02-15', 4680000, 'pagado', 2, 2),
+('2024-03-20', 2850000, 'pagado', 3, 3),
+('2024-04-05', 7120000, 'pagado', 4, 4),
+('2024-05-12', 2595000, 'pagado', 5, 5),
+('2024-06-18', 8975000, 'pagado', 6, 6),
+('2024-07-22', 7320000, 'pagado', 7, 7),
+('2024-08-30', 5245000, 'pagado', 8, 8),
+('2024-09-14', 4580000, 'pagado', 9, 9),
+('2024-10-01', 4410000, 'pagado', 10, 10);
+
+INSERT INTO DETALLE_VENTA (cantidad, subtotal, descuento, IVA, total, estado, PCidPC, VENTAidVenta, IDPeriferico) VALUES
+(1, 2800000, 0, 45000, 2845000, 'activo', 1, 1, 1),
+(1, 4500000, 0, 180000, 4680000, 'activo', 2, 2, 2),
+(1, 2200000, 0, 650000, 2850000, 'activo', 3, 3, 3),
+(1, 6800000, 0, 320000, 7120000, 'activo', 4, 4, 4),
+(1, 2500000, 0, 95000, 2595000, 'activo', 5, 5, 5),
+(1, 8900000, 0, 75000, 8975000, 'activo', 6, 6, 6),
+(1, 7200000, 0, 120000, 7320000, 'activo', 7, 7, 7),
+(1, 5100000, 0, 145000, 5245000, 'activo', 8, 8, 8),
+(1, 3600000, 0, 980000, 4580000, 'activo', 9, 9, 9),
+(1, 4200000, 0, 210000, 4410000, 'activo', 10, 10, 10);
